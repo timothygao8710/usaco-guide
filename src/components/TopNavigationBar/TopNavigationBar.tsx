@@ -16,7 +16,6 @@ import {
   SECTIONS,
 } from '../../../content/ordering';
 import styled from 'styled-components';
-import tw from 'twin.macro';
 import Logo from '../Logo';
 import LogoSquare from '../LogoSquare';
 import UserDataContext from '../../context/UserDataContext/UserDataContext';
@@ -24,41 +23,39 @@ import SectionsDropdown from '../SectionsDropdown';
 import ContactUsSlideover from '../ContactUsSlideover/ContactUsSlideover';
 import MobileMenuButtonContainer from '../MobileMenuButtonContainer';
 import { searchClient } from '../../utils/algoliaSearchClient';
-import SEO from '../seo';
-import Layout from '../layout';
 import { OutboundLink } from 'gatsby-plugin-google-analytics';
 import Transition from '../Transition';
 import SettingsModal from '../SettingsModal';
 
-const SearchResultDescription = styled.p`
-  ${tw`leading-4`}
-
-  > p > .ais-Highlight > * {
-    ${tw`text-gray-700`}
-    ${tw`text-sm!`}
-  }
-
-  .mode-dark & > p > .ais-Highlight > * {
-    ${tw`text-gray-300`}
-  }
-
-  > .ais-Snippet > * {
-    ${tw`text-gray-400`}
-    ${tw`text-sm!`}
-  }
-`;
-
-const SearchResultsContainer = styled.div`
-  ${tw`absolute z-10 bg-white lg:rounded shadow-md lg:border lg:border-gray-400 z-10 mt-3 inset-x-0 lg:left-auto lg:w-screen lg:max-w-3xl`}
-
-  .mode-dark & {
-    ${tw`bg-dark-surface lg:border-gray-700`}
-  }
-
-  .mode-dark & .ais-PoweredBy {
-    ${tw`text-dark-high-emphasis!`}
-  }
-`;
+// const SearchResultDescription = styled.p`
+//   ${tw`leading-4`}
+//
+//   > p > .ais-Highlight > * {
+//     ${tw`text-gray-700`}
+//     ${tw`text-sm!`}
+//   }
+//
+//   .mode-dark & > p > .ais-Highlight > * {
+//     ${tw`text-gray-300`}
+//   }
+//
+//   > .ais-Snippet > * {
+//     ${tw`text-gray-400`}
+//     ${tw`text-sm!`}
+//   }
+// `;
+//
+// const SearchResultsContainer = styled.div`
+//   ${tw`absolute z-10 bg-white lg:rounded shadow-md lg:border lg:border-gray-400 z-10 mt-3 inset-x-0 lg:left-auto lg:w-screen lg:max-w-3xl`}
+//
+//   .mode-dark & {
+//     ${tw`bg-dark-surface lg:border-gray-700`}
+//   }
+//
+//   .mode-dark & .ais-PoweredBy {
+//     ${tw`text-dark-high-emphasis!`}
+//   }
+// `;
 
 const indexName =
   process.env.NODE_ENV === 'production' ? 'prod_modules' : 'dev_modules';
@@ -108,32 +105,32 @@ const ModuleSearch = ({ hits, currentRefinement, refine }) => {
           autoComplete="off"
         />
       </div>
-      {showResults && (
-        <SearchResultsContainer>
-          <div className="px-4 pt-4">
-            <PoweredBy />
-          </div>
-          <div className="mt-2">
-            {hits.map(hit => (
-              <Link
-                to={moduleIDToURLMap[hit.id]}
-                className="block hover:bg-blue-100 dark-hover:bg-gray-700 px-4 py-2 transition duration-150 ease-in-out"
-              >
-                <h3 className="text-gray-600 dark:text-dark-high-emphasis font-medium">
-                  <Highlight hit={hit} attribute="title" /> -{' '}
-                  {SECTION_LABELS[hit.division]}
-                </h3>
-                <SearchResultDescription>
-                  <p className="mb-1">
-                    <Highlight hit={hit} attribute="description" />
-                  </p>
-                  <Snippet hit={hit} attribute="content" />
-                </SearchResultDescription>
-              </Link>
-            ))}
-          </div>
-        </SearchResultsContainer>
-      )}
+      {/*{showResults && (*/}
+      {/*  <SearchResultsContainer>*/}
+      {/*    <div className="px-4 pt-4">*/}
+      {/*      <PoweredBy />*/}
+      {/*    </div>*/}
+      {/*    <div className="mt-2">*/}
+      {/*      {hits.map(hit => (*/}
+      {/*        <Link*/}
+      {/*          to={moduleIDToURLMap[hit.id]}*/}
+      {/*          className="block hover:bg-blue-100 dark-hover:bg-gray-700 px-4 py-2 transition duration-150 ease-in-out"*/}
+      {/*        >*/}
+      {/*          <h3 className="text-gray-600 dark:text-dark-high-emphasis font-medium">*/}
+      {/*            <Highlight hit={hit} attribute="title" /> -{' '}*/}
+      {/*            {SECTION_LABELS[hit.division]}*/}
+      {/*          </h3>*/}
+      {/*          <SearchResultDescription>*/}
+      {/*            <p className="mb-1">*/}
+      {/*              <Highlight hit={hit} attribute="description" />*/}
+      {/*            </p>*/}
+      {/*            <Snippet hit={hit} attribute="content" />*/}
+      {/*          </SearchResultDescription>*/}
+      {/*        </Link>*/}
+      {/*      ))}*/}
+      {/*    </div>*/}
+      {/*  </SearchResultsContainer>*/}
+      {/*)}*/}
     </div>
   );
 };

@@ -210,7 +210,7 @@ export default function IndexPage(props: PageProps) {
           </div>
 
           <div className="mt-16">
-            <ul className="md:grid md:grid-cols-2 md:col-gap-8 md:row-gap-10">
+            <ul className="md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
               <li>
                 <div className="flex">
                   <div className="flex-shrink-0">
@@ -474,16 +474,15 @@ export default function IndexPage(props: PageProps) {
                     <p className="text-base leading-6 text-gray-500 dark:text-gray-400">
                       If you get stuck, feel free to ask for help by clicking
                       the "Contact Us" button. It may take some time for your
-                      question to be addressed. 
-                      You can also head over to the{' '}
+                      question to be addressed. You can also head over to the{' '}
                       <OutboundLink
                         href="https://forum.usaco.guide"
                         target="_blank"
                         className="text-blue-600 dark:text-blue-400 underline"
                       >
-                        USACO Forum  
-                      </OutboundLink>
-                      {' '}for help.
+                        USACO Forum
+                      </OutboundLink>{' '}
+                      for help.
                     </p>
                   </dd>
                 </div>
