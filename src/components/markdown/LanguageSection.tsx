@@ -6,9 +6,9 @@ import { LANGUAGE_LABELS } from '../../context/UserDataContext/properties/userLa
 export const LanguageSection = props => {
   const { lang } = useContext(UserDataContext);
 
-  let sections = {};
+  const sections = {};
   React.Children.map(props.children, child => {
-    let type = child.props.mdxType;
+    const type = child.props.mdxType;
     if (type === 'CPPSection') sections['cpp'] = child;
     if (type === 'JavaSection') sections['java'] = child;
     if (type === 'PySection') sections['py'] = child;

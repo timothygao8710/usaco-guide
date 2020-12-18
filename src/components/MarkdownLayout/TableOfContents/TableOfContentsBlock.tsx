@@ -9,7 +9,7 @@ const TableOfContentsBlock = ({
 }: {
   tableOfContents: TOCHeading[];
 }) => {
-  let links = genLinksFromTOCHeadings(
+  const links = genLinksFromTOCHeadings(
     tableOfContents,
     _ =>
       'block mb-2 transition duration-150 ease-in-out text-gray-600 dark:text-dark-med-emphasis hover:underline hover:text-blue-600 dark-hover:text-dark-high-emphasis'

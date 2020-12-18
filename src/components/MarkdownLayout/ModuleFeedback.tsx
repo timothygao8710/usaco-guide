@@ -41,7 +41,7 @@ export default function ModuleFeedback({
     if (message === '') return;
     if (email === '' || !validateEmail(email)) return;
 
-    let data = new FormData();
+    const data = new FormData();
     data.append('email', email);
     data.append('location', markdownData.title);
     data.append('url', window.location.href);

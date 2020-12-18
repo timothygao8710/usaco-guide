@@ -19,7 +19,7 @@ export default class UserProgressOnProblemsProperty extends UserDataPropertyAPI 
   private activityValue: ProblemActivity[] = [];
 
   initializeFromLocalStorage = () => {
-    let legacyValue = this.getValueFromLocalStorage(
+    const legacyValue = this.getValueFromLocalStorage(
       'guide:userData:problemStatus',
       null
     );

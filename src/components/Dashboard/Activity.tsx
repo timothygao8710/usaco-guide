@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import UserDataContext from '../../context/UserDataContext/UserDataContext';
 
 export default function Activity() {
-  let startDate = new Date();
+  const startDate = new Date();
   startDate.setMonth(startDate.getMonth() - 3);
 
   const getTooltipDataAttrs = value => {
@@ -26,16 +26,16 @@ export default function Activity() {
   } = useContext(UserDataContext);
   const activityCount = {};
 
-  for (let activity of userProgressOnModulesActivity) {
-    let newDate = new Date(activity.timestamp);
+  for (const activity of userProgressOnModulesActivity) {
+    const newDate = new Date(activity.timestamp);
     newDate.setHours(0, 0, 0, 0);
 
     if (newDate.getTime() in activityCount) activityCount[newDate.getTime()]++;
     else activityCount[newDate.getTime()] = 1;
   }
 
-  for (let activity of userProgressOnProblemsActivity) {
-    let newDate = new Date(activity.timestamp);
+  for (const activity of userProgressOnProblemsActivity) {
+    const newDate = new Date(activity.timestamp);
     newDate.setHours(0, 0, 0, 0);
 
     if (newDate.getTime() in activityCount) activityCount[newDate.getTime()]++;

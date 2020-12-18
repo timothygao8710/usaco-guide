@@ -391,7 +391,7 @@ export default function PostPage(props: {
                                 .data()
                                 [key].findIndex(a => a.id === id);
                               if (postIndex === -1) return;
-                              let newData = doc.data()[key];
+                              const newData = doc.data()[key];
                               newData[postIndex].title =
                                 title ||
                                 `Untitled ${
@@ -573,7 +573,7 @@ export default function PostPage(props: {
                     type === 'announcement' ? 'announcements' : 'assignments';
                   const postIndex = doc.data()[key].findIndex(a => a.id === id);
                   if (postIndex === -1) return;
-                  let newData = doc.data()[key];
+                  const newData = doc.data()[key];
                   newData[postIndex].published = !post.published;
                   if (!post.published) {
                     newData[

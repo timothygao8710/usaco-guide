@@ -103,7 +103,7 @@ export default function ({ markdown, debounce = 1000 }) {
       }
     };
     if (debounce > 0) {
-      let id = setTimeout(compile, debounce);
+      const id = setTimeout(compile, debounce);
       return () => clearTimeout(id);
     } else {
       compile();

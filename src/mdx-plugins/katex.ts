@@ -8,7 +8,7 @@ const remarkMath = require(`remark-math`);
 module.exports = ({ markdownAST }, pluginOptions = {}) => {
   visit(markdownAST, `inlineMath`, node => {
     node.type = `html`;
-    let latex = node.value;
+    const latex = node.value;
     node.value = katex.renderToString(latex, {
       displayMode: false,
       ...pluginOptions,
@@ -21,7 +21,7 @@ module.exports = ({ markdownAST }, pluginOptions = {}) => {
 
   visit(markdownAST, `math`, node => {
     node.type = `html`;
-    let latex = node.value;
+    const latex = node.value;
     node.value = katex.renderToString(latex, {
       displayMode: true,
       ...pluginOptions,

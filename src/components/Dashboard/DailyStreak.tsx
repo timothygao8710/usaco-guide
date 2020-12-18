@@ -12,7 +12,7 @@ const ComeBackTimer = ({ tomorrowMilliseconds }) => {
   );
 
   React.useEffect(() => {
-    let interval = setInterval(() => {
+    const interval = setInterval(() => {
       setMilliseconds(tomorrowMilliseconds - Date.now());
     }, 1000);
 

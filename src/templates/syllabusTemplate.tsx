@@ -133,11 +133,11 @@ export default function Template(props) {
     (acc, cur) => [...acc, ...cur.items.map(x => x.frontmatter.id)],
     []
   );
-  let moduleProgressInfo = getModulesProgressInfo(moduleIDs);
-  let problemIDs = [];
-  for (let chapter of MODULE_ORDERING[division]) {
-    for (let moduleID of chapter.items) {
-      for (let problem of allModules[moduleID].problems) {
+  const moduleProgressInfo = getModulesProgressInfo(moduleIDs);
+  const problemIDs = [];
+  for (const chapter of MODULE_ORDERING[division]) {
+    for (const moduleID of chapter.items) {
+      for (const problem of allModules[moduleID].problems) {
         problemIDs.push(problem.uniqueID);
       }
     }

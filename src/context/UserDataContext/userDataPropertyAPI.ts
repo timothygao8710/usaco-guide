@@ -90,7 +90,7 @@ export default abstract class UserDataPropertyAPI {
    * Helper method that parses and returns the given key from localStorage
    */
   protected getValueFromLocalStorage(key, defaultValue) {
-    let value = window.localStorage.getItem(key);
+    const value = window.localStorage.getItem(key);
     let v = null;
     try {
       v = JSON.parse(value);

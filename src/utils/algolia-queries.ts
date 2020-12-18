@@ -77,8 +77,8 @@ const queries = [
   {
     query: problemsQuery,
     transformer: ({ data }) => {
-      let res = [];
-      let problemModules = {};
+      const res = [];
+      const problemModules = {};
       data.data.edges.forEach(edge => {
         edge.node.problems.forEach(x => {
           if (!(x.id in problemModules)) {
@@ -92,7 +92,7 @@ const queries = [
       });
       data.data.edges.forEach(edge => {
         edge.node.problems.forEach(x => {
-          if (!!res.find(existing => existing.objectID === x.uniqueID)) return;
+          if (res.find(existing => existing.objectID === x.uniqueID)) return;
 
           res.push(problemToAlgoliaRecord(x, problemModules[x.id]));
         });

@@ -6,8 +6,8 @@ export default function genLinksFromTOCHeadings(
   headings: TOCHeading[],
   getClasses: (heading: TOCHeading) => string
 ) {
-  let indentationLevels = ['0', '1.5rem', '3rem', '4.5rem'];
-  let links: React.ReactNode[] = [];
+  const indentationLevels = ['0', '1.5rem', '3rem', '4.5rem'];
+  const links: React.ReactNode[] = [];
   let curDepth = -1;
   let indentIdx = 0;
   headings.forEach((heading, idx) => {

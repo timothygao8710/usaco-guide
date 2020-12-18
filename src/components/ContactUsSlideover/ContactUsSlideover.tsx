@@ -128,7 +128,7 @@ export default function ContactUsSlideover({
       return;
     }
 
-    let data = new FormData();
+    const data = new FormData();
     data.append('name', name);
     data.append('email', email);
     data.append('location', location);

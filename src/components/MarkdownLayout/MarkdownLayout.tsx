@@ -151,20 +151,20 @@ const NavBar = ({ alignNavButtonsRight = true }) => {
   if (markdownLayoutInfo instanceof SolutionInfo) return null;
 
   const sortedModuleLinks = React.useMemo(() => {
-    let links: ModuleLinkInfo[] = [];
-    for (let group of MODULE_ORDERING[markdownLayoutInfo.section]) {
-      for (let id of group.items) {
+    const links: ModuleLinkInfo[] = [];
+    for (const group of MODULE_ORDERING[markdownLayoutInfo.section]) {
+      for (const id of group.items) {
         links.push(sidebarLinks.find(x => x.id === id));
       }
     }
     return links;
   }, [sidebarLinks]);
-  let moduleIdx = React.useMemo(
+  const moduleIdx = React.useMemo(
     () => sortedModuleLinks.findIndex(x => x.id === markdownLayoutInfo.id),
     [markdownLayoutInfo, sortedModuleLinks]
   );
-  let prevModule = moduleIdx === 0 ? null : sortedModuleLinks[moduleIdx - 1];
-  let nextModule =
+  const prevModule = moduleIdx === 0 ? null : sortedModuleLinks[moduleIdx - 1];
+  const nextModule =
     moduleIdx === sortedModuleLinks.length - 1
       ? null
       : sortedModuleLinks[moduleIdx + 1];
@@ -232,7 +232,7 @@ const NavBar = ({ alignNavButtonsRight = true }) => {
 };
 
 const renderPrerequisite = (prerequisite, moduleLinks: ModuleLinkInfo[]) => {
-  let moduleLink = moduleLinks.find(x => x.id === prerequisite);
+  const moduleLink = moduleLinks.find(x => x.id === prerequisite);
   if (moduleLink)
     return (
       <li key={prerequisite}>
@@ -323,7 +323,7 @@ export default function MarkdownLayout({
   // console.log(markdownData)
   // console.log(moduleLinks)
   // console.log(userProgressOnProblems)
-  let problemIDs = [];
+  const problemIDs = [];
   const activeIDs = [];
 
   if (markdownData instanceof ModuleInfo) {
@@ -332,13 +332,13 @@ export default function MarkdownLayout({
     // oops how to assert not -1
 
     // while (moduleLinks[ind].id != markdownData.id) ind++;
-    for (let problem of moduleLinks[ind].probs) {
+    for (const problem of moduleLinks[ind].probs) {
       const uniqueID = problem.uniqueID;
       problemIDs.push(uniqueID);
     }
   } else {
     moduleLinks.forEach(link => {
-      for (let problem of link.probs) {
+      for (const problem of link.probs) {
         if (problem.solID === markdownData.id) {
           activeIDs.push(link.id);
         }

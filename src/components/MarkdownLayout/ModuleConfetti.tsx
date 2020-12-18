@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 const ModuleConfetti = forwardRef((props, ref) => {
-  let config = {
+  const config = {
     numParticles: 100,
     gravity: 250,
     speed: 250,

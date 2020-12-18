@@ -24,7 +24,7 @@ const ProgressDropdown = ({ onProgressSelected, currentProgress }) => {
     currentProgress
   );
 
-  const icon = (status: ProblemProgress, equal: Boolean) => {
+  const icon = (status: ProblemProgress, equal: boolean) => {
     const colorMap: { [key in ProblemProgress]: string } = {
       'Not Attempted': '',
       Solving: 'text-orange-500',
@@ -43,9 +43,9 @@ const ProgressDropdown = ({ onProgressSelected, currentProgress }) => {
       ),
       Reviewing: (
         <path
-          fill-rule="evenodd"
+          fillRule="evenodd"
           d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z"
-          clip-rule="evenodd"
+          clipRule="evenodd"
         />
       ),
       Skipped: (
@@ -159,7 +159,7 @@ export default function ProblemStatusCheckbox({
     if (moduleProgress !== 'Not Started') return;
     setModuleProgress(markdownLayoutInfo.id, 'Practicing');
   };
-  let status: ProblemProgress =
+  const status: ProblemProgress =
     userProgressOnProblems[problem.uniqueID] || 'Not Attempted';
   const color: { [key in ProblemProgress]: string } = {
     'Not Attempted': 'bg-gray-200 dark:bg-gray-700',
@@ -181,7 +181,7 @@ export default function ProblemStatusCheckbox({
               // @ts-ignore
               tippyRef.current.hide();
               setUserProgressOnProblems(problem, progress);
-              let solved = x => x == 'Reviewing' || x == 'Solved';
+              const solved = x => x == 'Reviewing' || x == 'Solved';
               if (progress == 'Solving' || solved(progress))
                 updateModuleProgressToPracticing();
               if (!solved(status) && solved(progress)) showConfetti();

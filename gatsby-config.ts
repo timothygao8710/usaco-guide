@@ -149,7 +149,7 @@ export const plugins = [
       apiKey: process.env.ALGOLIA_API_KEY,
       queries: require('./src/utils/algolia-queries'),
       enablePartialUpdates: true,
-      skipIndexing: !!!process.env.ALGOLIA_APP_ID,
+      skipIndexing: !process.env.ALGOLIA_APP_ID,
     },
   },
   'gatsby-plugin-webpack-bundle-analyser-v2',

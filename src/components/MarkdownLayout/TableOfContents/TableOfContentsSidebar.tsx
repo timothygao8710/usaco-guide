@@ -22,7 +22,7 @@ const TableOfContentsSidebar = ({
     (activeHash === heading.slug
       ? 'underline text-blue-600 dark:text-dark-high-emphasis'
       : 'text-gray-600 hover:underline hover:text-blue-600 dark:text-dark-med-emphasis');
-  let links = genLinksFromTOCHeadings(tableOfContents, getLinkStyles);
+  const links = genLinksFromTOCHeadings(tableOfContents, getLinkStyles);
 
   const githubUrl = getGithubUrl();
   return (

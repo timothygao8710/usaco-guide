@@ -57,7 +57,7 @@ export default function DashboardPage(props: PageProps) {
     signIn,
   } = React.useContext(UserDataContext);
 
-  let showIgnored = userSettings.showIgnored;
+  const showIgnored = userSettings.showIgnored;
 
   const lastViewedModuleURL = moduleIDToURLMap[lastViewedModuleID];
   const activeModules: ActiveItem[] = React.useMemo(() => {
@@ -110,7 +110,7 @@ export default function DashboardPage(props: PageProps) {
   // console.log(Object.keys(moduleIDToName).filter(
   //   x => moduleIDToSectionMap[x] == null
   // )); shouldn't be any ...
-  let allModulesProgressInfo = getModulesProgressInfo(moduleProgressIDs);
+  const allModulesProgressInfo = getModulesProgressInfo(moduleProgressIDs);
 
   const problemStatisticsIDs = moduleProgressIDs.reduce((acc, cur) => {
     return [

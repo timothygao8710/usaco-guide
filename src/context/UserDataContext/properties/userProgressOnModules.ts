@@ -16,7 +16,7 @@ export default class UserProgressOnModulesProperty extends UserDataPropertyAPI {
   private activityValue: ModuleActivity[] = [];
 
   initializeFromLocalStorage = () => {
-    let legacyValue = this.getValueFromLocalStorage(
+    const legacyValue = this.getValueFromLocalStorage(
       'guide:userData:progress',
       null
     );
