@@ -18,11 +18,16 @@
     "@sentry/gatsby": "^5.27.3",
     "@tailwindcss/ui": "^0.6.2",
     "@tippyjs/react": "^4.1.0",
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
     "algoliasearch": "^4.4.0",
     "babel-plugin-styled-components": "^1.11.1",
     "broken-link-checker": "https://github.com/alexlouden/broken-link-checker",
     "classnames": "^2.2.6",
     "disqus-react": "^1.0.10",
+    "eslint": "^7.15.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-react": "^7.21.5",
     "esm": "^3.2.25",
     "firebase": "^7.17.2",
     "frappe-charts": "^1.5.3",
@@ -110,6 +115,7 @@
     "build": "gatsby build",
     "develop": "gatsby develop",
     "format": "prettier --write .",
+    "lint": "eslint --ext .jsx --ext .js --ext .ts --ext .tsx --cache .",
     "start": "npm run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
@@ -130,6 +136,7 @@
     }
   },
   "lint-staged": {
+    "*.{js,ts,jsx,tsx}": "eslint",
     "*.{js,jsx,ts,tsx,json,md}": "prettier --write"
   },
   "babelMacros": {
