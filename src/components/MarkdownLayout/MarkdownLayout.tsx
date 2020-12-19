@@ -25,25 +25,11 @@ import { getProblemsProgressInfo } from '../../utils/getProgressInfo';
 import { DashboardProgressSmall } from '../../components/Dashboard/DashboardProgress';
 import ModuleFeedback from './ModuleFeedback';
 import SettingsModal from '../SettingsModal';
-import DisqusComments from '../DisqusComments';
-import { OutboundLink } from 'gatsby-plugin-google-analytics';
-import ConfettiContext, {
-  ConfettiProvider,
-} from '../../context/ConfettiContext';
-
-const ForumBanner = () => {
-  return (
-    <div className="fixed bottom-0 right-0 m-4">
-      <OutboundLink
-        className="block shadow-md hover:shadow-lg py-2 px-3 border border-gray-200 dark:border-gray-700 transform hover:-translate-y-2 hover:bg-gray-50 bg-white dark:bg-dark-surface dark-hover:bg-gray-900 transition duration-150 ease-in-out"
-        target="_blank"
-        href="https://forum.usaco.guide/"
-      >
-        Need help? Join the USACO Forum!
-      </OutboundLink>
-    </div>
-  );
-};
+import ConfettiContext from '../../context/ConfettiContext';
+import ForumCTA from '../ForumCTA';
+import SettingsModalContext, {
+  SettingsModalProvider,
+} from '../../context/SettingsModalContext';
 
 const Breadcrumbs = () => {
   const moduleLayoutInfo = useContext(MarkdownLayoutContext);
@@ -90,13 +76,17 @@ const Breadcrumbs = () => {
   );
 };
 
-const SidebarBottomButtons = ({ onContactUs, onOpenSettings }) => {
+const SidebarBottomButtons = ({ onContactUs, onButtonPress }) => {
+  const { setIsSettingsModalOpen } = useContext(SettingsModalContext);
   return (
     <>
       <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-800 flex">
         <button
           className="group flex-1 flex items-center p-4 text-sm leading-5 font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-dark-med-emphasis dark-hover:text-dark-high-emphasis dark-focus:text-dark-high-emphasis dark-hover:bg-gray-900 dark-focus:bg-gray-900 focus:outline-none focus:bg-gray-100 transition ease-in-out duration-150"
-          onClick={onOpenSettings}
+          onClick={() => {
+            setIsSettingsModalOpen(true);
+            onButtonPress();
+          }}
         >
           <svg
             className="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500 dark:text-gray-500 dark-group-hover:text-gray-400 transition ease-in-out duration-150"
@@ -151,20 +141,20 @@ const NavBar = ({ alignNavButtonsRight = true }) => {
   if (markdownLayoutInfo instanceof SolutionInfo) return null;
 
   const sortedModuleLinks = React.useMemo(() => {
-    const links: ModuleLinkInfo[] = [];
-    for (const group of MODULE_ORDERING[markdownLayoutInfo.section]) {
-      for (const id of group.items) {
+    let links: ModuleLinkInfo[] = [];
+    for (let group of MODULE_ORDERING[markdownLayoutInfo.section]) {
+      for (let id of group.items) {
         links.push(sidebarLinks.find(x => x.id === id));
       }
     }
     return links;
   }, [sidebarLinks]);
-  const moduleIdx = React.useMemo(
+  let moduleIdx = React.useMemo(
     () => sortedModuleLinks.findIndex(x => x.id === markdownLayoutInfo.id),
     [markdownLayoutInfo, sortedModuleLinks]
   );
-  const prevModule = moduleIdx === 0 ? null : sortedModuleLinks[moduleIdx - 1];
-  const nextModule =
+  let prevModule = moduleIdx === 0 ? null : sortedModuleLinks[moduleIdx - 1];
+  let nextModule =
     moduleIdx === sortedModuleLinks.length - 1
       ? null
       : sortedModuleLinks[moduleIdx + 1];
@@ -232,7 +222,7 @@ const NavBar = ({ alignNavButtonsRight = true }) => {
 };
 
 const renderPrerequisite = (prerequisite, moduleLinks: ModuleLinkInfo[]) => {
-  const moduleLink = moduleLinks.find(x => x.id === prerequisite);
+  let moduleLink = moduleLinks.find(x => x.id === prerequisite);
   if (moduleLink)
     return (
       <li key={prerequisite}>
@@ -249,9 +239,9 @@ const renderPrerequisite = (prerequisite, moduleLinks: ModuleLinkInfo[]) => {
 };
 
 export default function MarkdownLayout({
-  markdownData,
-  children,
-}: {
+                                         markdownData,
+                                         children,
+                                       }: {
   markdownData: ModuleInfo | SolutionInfo;
   children: React.ReactNode;
 }) {
@@ -267,7 +257,6 @@ export default function MarkdownLayout({
   } = useContext(UserDataContext);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isContactUsActive, setIsContactUsActive] = useState(false);
-  const [isSettingsActive, setIsSettingsActive] = useState(false);
   const moduleProgress =
     (userProgressOnModules && userProgressOnModules[markdownData.id]) ||
     'Not Started';
@@ -283,6 +272,7 @@ export default function MarkdownLayout({
             frontmatter {
               title
               id
+              author
             }
             fields {
               division
@@ -323,22 +313,28 @@ export default function MarkdownLayout({
   // console.log(markdownData)
   // console.log(moduleLinks)
   // console.log(userProgressOnProblems)
-  const problemIDs = [];
+  let problemIDs = [];
   const activeIDs = [];
+  const prob_to_module = {};
+
+  for (let moduleLink of moduleLinks) {
+    for (let problem of moduleLink.probs) {
+      const uniqueID = problem.uniqueID;
+      prob_to_module[uniqueID] = module.id;
+    }
+  }
 
   if (markdownData instanceof ModuleInfo) {
     activeIDs.push(markdownData.id);
     const ind = moduleLinks.findIndex(link => link.id === markdownData.id);
     // oops how to assert not -1
-
-    // while (moduleLinks[ind].id != markdownData.id) ind++;
-    for (const problem of moduleLinks[ind].probs) {
+    for (let problem of moduleLinks[ind].probs) {
       const uniqueID = problem.uniqueID;
       problemIDs.push(uniqueID);
     }
   } else {
     moduleLinks.forEach(link => {
-      for (const problem of link.probs) {
+      for (let problem of link.probs) {
         if (problem.solID === markdownData.id) {
           activeIDs.push(link.id);
         }
@@ -347,8 +343,6 @@ export default function MarkdownLayout({
   }
 
   const problemsProgressInfo = getProblemsProgressInfo(problemIDs);
-
-  const { darkMode } = useContext(UserDataContext);
 
   // @ts-ignore
   return (
@@ -359,190 +353,188 @@ export default function MarkdownLayout({
         activeIDs: activeIDs,
       }}
     >
-      <Transition show={isMobileNavOpen} timeout={300}>
-        <div className="lg:hidden">
-          <div className="fixed inset-0 flex z-40">
-            <Transition
-              enter="transition-opacity ease-linear duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="transition-opacity ease-linear duration-300"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <div
-                className="fixed inset-0"
-                onClick={() => setIsMobileNavOpen(false)}
+      <SettingsModalProvider>
+        <Transition show={isMobileNavOpen} timeout={300}>
+          <div className="lg:hidden">
+            <div className="fixed inset-0 flex z-40">
+              <Transition
+                enter="transition-opacity ease-linear duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="transition-opacity ease-linear duration-300"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
               >
-                <div className="absolute inset-0 bg-gray-600 dark:bg-gray-800 opacity-75" />
-              </div>
-            </Transition>
+                <div
+                  className="fixed inset-0"
+                  onClick={() => setIsMobileNavOpen(false)}
+                >
+                  <div className="absolute inset-0 bg-gray-600 dark:bg-gray-800 opacity-75" />
+                </div>
+              </Transition>
 
-            <Transition
-              enter="transition ease-in-out duration-300 transform"
-              enterFrom="-translate-x-full"
-              enterTo="translate-x-0"
-              leave="transition ease-in-out duration-300 transform"
-              leaveFrom="translate-x-0"
-              leaveTo="-translate-x-full"
-            >
-              <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-dark-surface">
-                <div className="absolute top-0 right-0 -mr-14 p-1">
-                  <button
-                    className="flex items-center justify-center h-12 w-12 rounded-full focus:outline-none focus:bg-gray-600"
-                    aria-label="Close sidebar"
-                    onClick={() => setIsMobileNavOpen(false)}
-                  >
-                    <svg
-                      className="h-6 w-6 text-white"
-                      stroke="currentColor"
-                      fill="none"
-                      viewBox="0 0 24 24"
+              <Transition
+                enter="transition ease-in-out duration-300 transform"
+                enterFrom="-translate-x-full"
+                enterTo="translate-x-0"
+                leave="transition ease-in-out duration-300 transform"
+                leaveFrom="translate-x-0"
+                leaveTo="-translate-x-full"
+              >
+                <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-dark-surface">
+                  <div className="absolute top-0 right-0 -mr-14 p-1">
+                    <button
+                      className="flex items-center justify-center h-12 w-12 rounded-full focus:outline-none focus:bg-gray-600"
+                      aria-label="Close sidebar"
+                      onClick={() => setIsMobileNavOpen(false)}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <div className="flex-1 h-0 pt-5 flex flex-col">
-                  <Link
-                    className="flex-shrink-0 flex items-center px-4"
-                    to="/dashboard/"
-                  >
-                    <Logo />
-                  </Link>
-                  <div className="px-4">
-                    <Breadcrumbs />
+                      <svg
+                        className="h-6 w-6 text-white"
+                        stroke="currentColor"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
                   </div>
-                  <SidebarNav />
+                  <div className="flex-1 h-0 pt-5 flex flex-col">
+                    <Link
+                      className="flex-shrink-0 flex items-center px-4"
+                      to="/dashboard/"
+                    >
+                      <Logo />
+                    </Link>
+                    <div className="px-4">
+                      <Breadcrumbs />
+                    </div>
+                    <SidebarNav />
+                  </div>
+                  <SidebarBottomButtons
+                    onButtonPress={() => {
+                      setIsMobileNavOpen(false);
+                    }}
+                    onContactUs={() => {
+                      setIsMobileNavOpen(false);
+                      setIsContactUsActive(true);
+                    }}
+                  />
                 </div>
-                <SidebarBottomButtons
-                  onOpenSettings={() => {
-                    setIsMobileNavOpen(false);
-                    setIsSettingsActive(true);
-                  }}
-                  onContactUs={() => {
-                    setIsMobileNavOpen(false);
-                    setIsContactUsActive(true);
-                  }}
-                />
+              </Transition>
+              <div className="flex-shrink-0 w-14">
+                {/* Force sidebar to shrink to fit close icon */}
               </div>
-            </Transition>
-            <div className="flex-shrink-0 w-14">
-              {/* Force sidebar to shrink to fit close icon */}
             </div>
           </div>
-        </div>
-      </Transition>
-      {/* Static sidebar for desktop */}
-      <div
-        className="hidden lg:block fixed z-10 top-0 left-0 bottom-0"
-        style={{ width: '20rem' }}
-      >
+        </Transition>
+        {/* Static sidebar for desktop */}
         <div
-          className="border-r border-gray-200 bg-white dark:bg-dark-surface dark:border-gray-800 h-screen flex flex-col"
+          className="hidden lg:block fixed z-10 top-0 left-0 bottom-0"
           style={{ width: '20rem' }}
         >
-          <div className="flex-grow h-0 flex flex-col pt-5">
-            <Link
-              className="flex items-center flex-shrink-0 px-4 pb-2"
-              to="/dashboard/"
-            >
-              <Logo />
-            </Link>
-            {/* Sidebar component, swap this element with another sidebar if you like */}
-            <SidebarNav />
-          </div>
-          <SidebarBottomButtons
-            onOpenSettings={() => {
-              setIsSettingsActive(true);
-            }}
-            onContactUs={() => setIsContactUsActive(true)}
-          />
-        </div>
-      </div>
-      <div>
-        <div className="sticky top-0 inset-x-0 bg-white dark:bg-dark-surface z-10 shadow lg:hidden pl-1 pt-1 flex items-center">
-          <MobileMenuButtonContainer
-            className="flex-shrink-0 -ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center"
-            aria-label="Open sidebar"
-            onClick={() => setIsMobileNavOpen(true)}
+          <div
+            className="border-r border-gray-200 bg-white dark:bg-dark-surface dark:border-gray-800 h-screen flex flex-col"
+            style={{ width: '20rem' }}
           >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </MobileMenuButtonContainer>
-          <div className="flex-1 ml-4 mr-4 sm:mr-6">
-            <NavBar />
+            <div className="flex-grow h-0 flex flex-col pt-5">
+              <Link
+                className="flex items-center flex-shrink-0 px-4 pb-2"
+                to="/dashboard/"
+              >
+                <Logo />
+              </Link>
+              {/* Sidebar component, swap this element with another sidebar if you like */}
+              <SidebarNav />
+            </div>
+            <SidebarBottomButtons
+              onButtonPress={() => {}}
+              onContactUs={() => setIsContactUsActive(true)}
+            />
           </div>
         </div>
-        <main
-          className="relative z-0 pt-6 lg:pt-2 pb-6 focus:outline-none"
-          tabIndex={0}
-        >
-          <div className="mx-auto">
-            <div className="flex justify-center">
-              {/* Placeholder for the sidebar */}
-              <div
-                className="flex-shrink-0 hidden lg:block order-1"
-                style={{ width: '20rem' }}
-              />
-              <div className="hidden xl:block ml-6 w-64 mt-48 flex-shrink-0 order-3">
-                <TableOfContentsSidebar tableOfContents={tableOfContents} />
-              </div>
-              <div className="flex-1 max-w-4xl px-4 sm:px-6 lg:px-8 w-0 min-w-0 order-2">
-                <div className="hidden lg:block">
-                  <NavBar />
+        <div>
+          <div className="sticky top-0 inset-x-0 bg-white dark:bg-dark-surface z-10 shadow lg:hidden pl-1 pt-1 flex items-center">
+            <MobileMenuButtonContainer
+              className="flex-shrink-0 -ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center"
+              aria-label="Open sidebar"
+              onClick={() => setIsMobileNavOpen(true)}
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </MobileMenuButtonContainer>
+            <div className="flex-1 ml-4 mr-4 sm:mr-6">
+              <NavBar />
+            </div>
+          </div>
+          <main
+            className="relative z-0 pt-6 lg:pt-2 pb-6 focus:outline-none"
+            tabIndex={0}
+          >
+            <div className="mx-auto">
+              <div className="flex justify-center">
+                {/* Placeholder for the sidebar */}
+                <div
+                  className="flex-shrink-0 hidden lg:block order-1"
+                  style={{ width: '20rem' }}
+                />
+                <div className="hidden xl:block ml-6 w-64 mt-48 flex-shrink-0 order-3">
+                  <TableOfContentsSidebar tableOfContents={tableOfContents} />
                 </div>
+                <div className="flex-1 max-w-4xl px-4 sm:px-6 lg:px-8 w-0 min-w-0 order-2">
+                  <div className="hidden lg:block">
+                    <NavBar />
+                  </div>
 
-                <div className="lg:h-8" />
+                  <div className="lg:h-8" />
 
-                {isLoaded && !firebaseUser && numPageviews > 1 && (
-                  <>
-                    <div className="bg-gray-50 dark:bg-gray-900 sm:rounded-lg">
-                      <div className="px-4 py-5 sm:p-6">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-dark-high-emphasis">
-                          You're not signed in!
-                        </h3>
-                        <div className="mt-2 max-w-xl text-sm leading-5 text-gray-500 dark:text-dark-med-emphasis">
-                          <p>
-                            Sign in to save your progress and sync your settings
-                            across devices.
-                          </p>
-                        </div>
-                        <div className="mt-5">
-                          <span className="inline-flex rounded-md shadow-sm">
-                            <button
-                              type="button"
-                              onClick={() => signIn()}
-                              className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 text-sm leading-5 font-medium rounded-md text-gray-700 dark:text-dark-high-emphasis bg-white dark:bg-gray-800 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150"
-                            >
-                              Sign in
-                            </button>
-                          </span>
+                  {isLoaded && !firebaseUser && numPageviews > 1 && (
+                    <>
+                      <div className="bg-gray-50 dark:bg-gray-900 sm:rounded-lg">
+                        <div className="px-4 py-5 sm:p-6">
+                          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-dark-high-emphasis">
+                            You're not signed in!
+                          </h3>
+                          <div className="mt-2 max-w-xl text-sm leading-5 text-gray-500 dark:text-dark-med-emphasis">
+                            <p>
+                              Sign in to save your progress and sync your
+                              settings across devices.
+                            </p>
+                          </div>
+                          <div className="mt-5">
+                            <span className="inline-flex rounded-md shadow-sm">
+                              <button
+                                type="button"
+                                onClick={() => signIn()}
+                                className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 text-sm leading-5 font-medium rounded-md text-gray-700 dark:text-dark-high-emphasis bg-white dark:bg-gray-800 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150"
+                              >
+                                Sign in
+                              </button>
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="h-8" />
-                  </>
-                )}
+                      <div className="h-8" />
+                    </>
+                  )}
 
-                {markdownData instanceof ModuleInfo &&
+                  {markdownData instanceof ModuleInfo &&
                   markdownData.frequency !== null && (
                     <div className="px-0.5">
                       <div className="sm:flex sm:items-center sm:justify-between mb-4 space-y-1 sm:space-y-0">
@@ -557,33 +549,33 @@ export default function MarkdownLayout({
                       </div>
                     </div>
                   )}
-                <div className="sm:flex sm:items-center sm:justify-between mb-4">
-                  <div className="flex-1 min-w-0">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-high-emphasis sm:text-3xl">
-                      {markdownData.title}
-                    </h1>
-                    {markdownData.author && (
-                      <p
-                        className={`text-gray-500 dark:text-dark-med-emphasis`}
-                      >
-                        Author
-                        {markdownData.author.indexOf(',') !== -1
-                          ? 's'
-                          : ''}: {markdownData.author}
-                      </p>
+                  <div className="sm:flex sm:items-center sm:justify-between mb-4">
+                    <div className="flex-1 min-w-0">
+                      <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-high-emphasis sm:text-3xl">
+                        {markdownData.title}
+                      </h1>
+                      {markdownData.author && (
+                        <p
+                          className={`text-gray-500 dark:text-dark-med-emphasis`}
+                        >
+                          Author
+                          {markdownData.author.indexOf(',') !== -1
+                            ? 's'
+                            : ''}: {markdownData.author}
+                        </p>
+                      )}
+                    </div>
+                    {markdownData instanceof ModuleInfo && (
+                      <div className="hidden lg:flex-shrink-0 lg:flex ml-4">
+                        <MarkCompleteButton
+                          state={moduleProgress}
+                          onChange={handleCompletionChange}
+                        />
+                      </div>
                     )}
                   </div>
-                  {markdownData instanceof ModuleInfo && (
-                    <div className="hidden lg:flex-shrink-0 lg:flex ml-4">
-                      <MarkCompleteButton
-                        state={moduleProgress}
-                        onChange={handleCompletionChange}
-                      />
-                    </div>
-                  )}
-                </div>
 
-                {markdownData instanceof ModuleInfo &&
+                  {markdownData instanceof ModuleInfo &&
                   markdownData.prerequisites && (
                     <div className="rounded-md bg-blue-50 dark:bg-blue-900 p-4 mb-4">
                       <div className="flex">
@@ -616,76 +608,60 @@ export default function MarkdownLayout({
                     </div>
                   )}
 
-                {markdownData instanceof ModuleInfo &&
+                  {markdownData instanceof ModuleInfo &&
                   markdownData.description && (
                     <p className="italic">{markdownData.description}</p>
                   )}
 
-                <div className="xl:hidden">
-                  <TableOfContentsBlock tableOfContents={tableOfContents} />
+                  <div className="xl:hidden">
+                    <TableOfContentsBlock tableOfContents={tableOfContents} />
+                  </div>
+
+                  {children}
+
+                  {markdownData instanceof ModuleInfo && (
+                    <h3 className="text-lg leading-6 font-medium text-gray-900 text-center mb-8 border-t border-b border-gray-200 py-8 dark:border-gray-800 dark:text-dark-high-emphasis flex items-center justify-center">
+                      <span>
+                        <TextTooltip content="You can use this as a way to track your progress throughout this guide.">
+                          Module Progress
+                        </TextTooltip>
+                        :
+                      </span>
+                      <span className="ml-4">
+                        <MarkCompleteButton
+                          onChange={handleCompletionChange}
+                          state={moduleProgress}
+                          dropdownAbove
+                        />
+                      </span>
+                    </h3>
+                  )}
+
+                  <ForumCTA />
+
+                  <div className="my-8">
+                    <ModuleFeedback markdownData={markdownData} />
+                  </div>
+
+                  <div className="pt-4">
+                    <NavBar alignNavButtonsRight={false} />
+                  </div>
+
+                  {/* Spacing for the USACO Forum popup */}
+                  <div className="h-12" />
                 </div>
-
-                {children}
-
-                {markdownData instanceof ModuleInfo && (
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 text-center mb-8 border-t border-b border-gray-200 py-8 dark:border-gray-800 dark:text-dark-high-emphasis flex items-center justify-center">
-                    <span>
-                      <TextTooltip content="You can use this as a way to track your progress throughout this guide.">
-                        Module Progress
-                      </TextTooltip>
-                      :
-                    </span>
-                    <span className="ml-4">
-                      <MarkCompleteButton
-                        onChange={handleCompletionChange}
-                        state={moduleProgress}
-                        dropdownAbove
-                      />
-                    </span>
-                  </h3>
-                )}
-
-                <div className="my-8">
-                  <ModuleFeedback markdownData={markdownData} />
-                </div>
-
-                <DisqusComments
-                  shortname="usacoguide"
-                  config={{
-                    url: `https://usaco.guide/${
-                      markdownData instanceof ModuleInfo
-                        ? markdownData.section
-                        : 'solutions'
-                    }/${markdownData.id}`,
-                    identifier: markdownData.id,
-                  }}
-                  // technically this isn't a valid prop, but disqus will detect the prop change
-                  // and will re-render automatically.
-                  // @ts-ignore
-                  theme={darkMode ? 'dark' : 'light'}
-                />
-
-                <div className="pt-4">
-                  <NavBar alignNavButtonsRight={false} />
-                </div>
-
-                {/* Spacing for the USACO Forum popup */}
-                <div className="h-12" />
               </div>
             </div>
-          </div>
-        </main>
-      </div>
-      <SettingsModal
-        isOpen={isSettingsActive}
-        onClose={() => setIsSettingsActive(false)}
-      />
-      <ContactUsSlideover
-        isOpen={isContactUsActive}
-        onClose={() => setIsContactUsActive(false)}
-        activeModule={markdownData instanceof ModuleInfo ? markdownData : null}
-      />
-      <ForumBanner />
+          </main>
+        </div>
+        <ContactUsSlideover
+          isOpen={isContactUsActive}
+          onClose={() => setIsContactUsActive(false)}
+          activeModule={
+            markdownData instanceof ModuleInfo ? markdownData : null
+          }
+        />
+      </SettingsModalProvider>
     </MarkdownLayoutContext.Provider>
   );
 }
